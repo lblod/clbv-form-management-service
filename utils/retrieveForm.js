@@ -1,7 +1,7 @@
 import fs from 'fs';
 import fse from 'fs-extra';
 import { bindingsToNT } from '../utils/bindingsToNT';
-import { siteUriForId, loadSite } from './commonQueries';
+import { siteUriForId, loadSite, loadAddress, loadContacts } from './commonQueries';
 
 export async function retrieveForm(siteId, formId) {
   let form = fs.readFileSync(`/config/${formId}/form.ttl`, 'utf8');
@@ -14,6 +14,8 @@ export async function retrieveForm(siteId, formId) {
   }
   const results = [];
   results.push(await loadSite(siteUri));
+  results.push(await loadAddress(siteUri));
+  results.push(await loadContacts(siteUri));
 
   const sourceBindings = results
         .reduce((acc, b) => [...acc, ...b]);
