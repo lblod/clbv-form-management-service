@@ -8,7 +8,6 @@ export async function retrieveForm(siteId, formId) {
   const metaFile = fse.readJsonSync(`/config/${formId}/form.json`);
 
   let siteUri = await siteUriForId(siteId);
-  console.log(siteUri);
   if(!siteUri) {
     throw `Site URI not found for id ${siteId}`;
   }
@@ -24,11 +23,9 @@ export async function retrieveForm(siteId, formId) {
 
   const metaTriples = [];
   metaTriples.push(await loadSiteTypes(siteUri));
-
-  const metaBindings = results
-        .reduce((acc, b) => [...acc, ...b]);
   
-  const meta = bindingsToNT(metaBindings).join("\r\n");
+  const meta = metaTriples
+    .reduce((acc, b) => [...acc, ...b]);
 
   return { form, source, meta, siteId };
 }

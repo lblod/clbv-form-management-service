@@ -73,21 +73,20 @@ export async function loadSiteTypes(siteId) {
     filteredTypes.push('"db13a289b78e42d19d8d1d269b61b18f"'); // Districtshuis
   }
 
-  const types = queryDatabaseTypes(filteredTypes);
+  const types = await queryDatabaseTypes(filteredTypes);
   const metaTriples = generateMetaTriplesForSiteTypes(types);
   return metaTriples;
 }
 
-async function getAdminUnitClassification(siteId) {
+async function getAdminUnitClassification(siteUuid) {
   return (await querySudo(`
     ${PREFIXES}
 
     SELECT DISTINCT ?classificationUuid
     WHERE {
-      ?adminUnit org:hasSite ?site.
+      ?adminUnit ?pred <${siteUuid}>.
       ?adminUnit org:classification ?classification.
       ?classification mu:uuid ?classificationUuid.
-      ?site mu:uuid "${siteId}".
     }
     LIMIT 1
   `)).results.bindings[0]?.classificationUuid?.value;
@@ -130,7 +129,6 @@ async function queryDatabaseTypes(siteTypesIds) {
         ${siteTypesIds.join(' ')}
       }
     }
-    LIMIT 1
   `)).results.bindings.map((binding) => ({uri: binding.uri.value, label: binding.label.value}));
 }
 
