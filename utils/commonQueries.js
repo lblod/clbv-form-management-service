@@ -54,8 +54,8 @@ export async function siteUriForId(siteId) {
 
 }
 
-export async function loadSiteTypes(siteId) {
-  const adminUnitClassification = await getAdminUnitClassification(siteId);
+export async function loadSiteTypes(adminUnitId) {
+  const adminUnitClassification = await getAdminUnitClassification(adminUnitId);
   let filteredTypes = [];
 
   filteredTypes.push('"f1381723dec42c0b6ba6492e41d6f5dd"'); // Maatschappelijke zetel
@@ -78,13 +78,13 @@ export async function loadSiteTypes(siteId) {
   return metaTriples;
 }
 
-async function getAdminUnitClassification(siteUuid) {
+async function getAdminUnitClassification(adminUnitId) {
   return (await querySudo(`
     ${PREFIXES}
 
     SELECT DISTINCT ?classificationUuid
     WHERE {
-      ?adminUnit ?pred <${siteUuid}>.
+      ?adminUnit mu:uuid "${adminUnitId}".
       ?adminUnit org:classification ?classification.
       ?classification mu:uuid ?classificationUuid.
     }
