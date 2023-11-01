@@ -2,7 +2,7 @@ steps:
   push-latest:
     image: plugins/docker
     settings:
-      repo: lblod/ember-rdfa-editor
+      repo: lblod/clbv-form-management-service
       tags: latest
     secrets: [ docker_username, docker_password ]
 when:
