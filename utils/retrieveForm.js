@@ -20,10 +20,15 @@ export async function retrieveForm(siteId, formId) {
   const sourceBindings = results
         .reduce((acc, b) => [...acc, ...b]);
 
+  const source = bindingsToNT(sourceBindings).join("\r\n");
+
   const metaTriples = [];
   metaTriples.push(await loadSiteTypes(siteUri));
 
-  const source = bindingsToNT(sourceBindings).join("\r\n");
+  const metaBindings = results
+        .reduce((acc, b) => [...acc, ...b]);
+  
+  const meta = bindingsToNT(metaBindings).join("\r\n");
 
-  return { form, source, siteId };
+  return { form, source, meta, siteId };
 }
