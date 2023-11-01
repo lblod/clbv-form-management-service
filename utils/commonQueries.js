@@ -43,14 +43,14 @@ export async function siteUriForId(siteId) {
   return (await querySudo(`
       ${PREFIXES}
 
-      SELECT DISTINCT ?service
+      SELECT DISTINCT ?site
       WHERE {
         BIND( ${sparqlEscapeString(siteId)} as ?uuid)
-        ?service a org:Site;
+        ?site a org:Site;
           mu:uuid ?uuid.
       }
       LIMIT 1
-    `)).results.bindings[0]?.service?.value;
+    `)).results.bindings[0]?.site?.value;
 
 }
 
@@ -75,6 +75,21 @@ export async function loadSiteTypes(siteId) {
 
   const types = queryDatabaseTypes(filteredTypes);
   const metaTriples = generateMetaTriplesForSiteTypes(types);
+}
+
+async function getAdminUnitClassification(siteId) {
+  return (await querySudo(`
+    ${PREFIXES}
+
+    SELECT DISTINCT ?classificationUuid
+    WHERE {
+      ?adminUnit org:hasSite ?site.
+      ?adminUnit org:classification ?classification.
+      ?classification mu:uuid ?classificationUuid.
+      ?site mu:uuid "${siteId}".
+    }
+    LIMIT 1
+  `)).results.bindings[0]?.classificationUuid?.value;
 }
 
 function isWorshipAdministrativeUnit(classification) {
