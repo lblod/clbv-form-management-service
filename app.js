@@ -1,6 +1,10 @@
 import { app, errorHandler, uuid } from 'mu';
 import { retrieveForm } from './utils/retrieveForm';
 import { updateForm } from './utils/updateForm';
+import bodyparser from 'body-parser';
+
+const bodySizeLimit = process.env.MAX_BODY_SIZE || '5Mb';
+app.use(bodyparser.json({limit: bodySizeLimit}));
 
 app.get('/semantic-forms/:adminUnitId/:siteId/form/:formId', async function(req, res) {
   const siteId = req.params["siteId"];
@@ -26,6 +30,7 @@ app.get('/semantic-forms/:adminUnitId/:siteId/form/:formId', async function(req,
 
 app.put('/semantic-forms/:adminUnitId/:siteId/form/:formId', async function(req, res) {
   const delta = req.body;
+  console.log(delta)
   try {
     await updateForm(delta, req.headers['mu-session-id']);
     return res.sendStatus(200);
