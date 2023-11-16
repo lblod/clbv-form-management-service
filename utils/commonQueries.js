@@ -74,7 +74,8 @@ export async function loadSiteTypes(adminUnitId) {
   }
 
   const types = await queryDatabaseTypes(filteredTypes);
-  const metaTriples = generateMetaTriplesForSiteTypes(types);
+  let metaTriples = generateMetaTriplesForSiteTypes(types);
+  metaTriples += generateContactTypeConceptScheme(); // TODO: here the datamodel is a pain to work with. We need to postprocess on save
   return metaTriples;
 }
 
@@ -134,15 +135,37 @@ async function queryDatabaseTypes(siteTypesIds) {
 
 function generateMetaTriplesForSiteTypes(siteTypes) {
   return `
+    @prefix skos: <http://www.w3.org/2004/02/skos/core#>.
+    @prefix cube: <https://cube.link/>.
+
     <http://clbv-form-management-service/concept-schemes/sitetypes>
       a <http://www.w3.org/2004/02/skos/core#ConceptScheme>;
       <http://www.w3.org/2004/02/skos/core#prefLabel> "Metasyntactic variables"@en.
-    
+
     ${siteTypes.map((type, index) => `
-      ${type.uri} a skos:Concept, rdf:Class;
+      <${type.uri}> a skos:Concept;
         skos:inScheme <http://clbv-form-management-service/concept-schemes/sitetypes>;
         skos:prefLabel "${type.label}"@en;
-        order: ${index}.
-    `)}
+        cube:order ${index}.
+    `).join('\n')}
+  `;
+}
+
+function generateContactTypeConceptScheme() {
+  return `
+    @prefix skos: <http://www.w3.org/2004/02/skos/core#>.
+    @prefix cube: <https://cube.link/>.
+
+    <http://data.lblod.info/conceptschemes/ContactTypes> a <http://www.w3.org/2004/02/skos/core#ConceptScheme>.
+
+    <http://data.lblod.info/conceptschemes/ContactType/Primary> a skos:Concept;
+        skos:inScheme <http://data.lblod.info/conceptschemes/ContactTypes>;
+        skos:prefLabel "Ja"@en;
+        cube:order 1.
+
+    <http://data.lblod.info/conceptschemes/ContactType/Secondary> a skos:Concept;
+        skos:inScheme <http://data.lblod.info/conceptschemes/ContactTypes>;
+        skos:prefLabel "Neen"@en;
+        cube:order 2.
   `;
 }
