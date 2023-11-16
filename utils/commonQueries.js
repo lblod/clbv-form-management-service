@@ -135,16 +135,22 @@ async function queryDatabaseTypes(siteTypesIds) {
 
 function generateMetaTriplesForSiteTypes(siteTypes) {
   return `
+    @prefix skos: <http://www.w3.org/2004/02/skos/core#>.
+    @prefix cube: <https://cube.link/>.
+
     <http://clbv-form-management-service/concept-schemes/sitetypes>
       a <http://www.w3.org/2004/02/skos/core#ConceptScheme>;
       <http://www.w3.org/2004/02/skos/core#prefLabel> "Metasyntactic variables"@en.
-    
+
     ${siteTypes.map((type, index) => `
-      ${type.uri} a skos:Concept, rdf:Class;
+      <${type.uri}> a skos:Concept;
         skos:inScheme <http://clbv-form-management-service/concept-schemes/sitetypes>;
         skos:prefLabel "${type.label}"@en;
-        order: ${index}.
-    `)}
+        cube:order ${index}.
+    `).join('\n')}
+  `;
+}
+
 function generateContactTypeConceptScheme() {
   return `
     @prefix skos: <http://www.w3.org/2004/02/skos/core#>.
